@@ -5,15 +5,15 @@ using UnityEngine;
 namespace ZeppelinGames {
     public class GlyphRecogniser {
         public static GlyphReturnData MatchGlyph(Vector2[] points, GlyphSO glyph) {
-            Vector2[] nPoints = normalisePoints(points);
-            Vector2[] nGlyphPoints = normalisePoints(glyph.points);
+            Vector2[] nPoints = NormalisePoints(points);
+            Vector2[] nGlyphPoints = NormalisePoints(glyph.points);
 
             int pointsInside = 0;
             foreach (Vector2 nP in nPoints) {
                 bool pointIn = false;
                 for (int n = 0; n < nGlyphPoints.Length - 1; n++) {
                     if (!pointIn) {
-                        if (pointNearLine(nP, nGlyphPoints[n], nGlyphPoints[n + 1], 0.1f)) {
+                        if (PointNearLine(nP, nGlyphPoints[n], nGlyphPoints[n + 1], 0.1f)) {
                             pointIn = true;
                             pointsInside++;
                         }
@@ -25,13 +25,13 @@ namespace ZeppelinGames {
             int pointsFound = 0;
             int accPoints = 0;
             for (int n = 0; n < nGlyphPoints.Length - 1; n++) {
-                Vector2[] cPs = subDivLine(nGlyphPoints[n], nGlyphPoints[n + 1], Mathf.FloorToInt(pointsInLine));
+                Vector2[] cPs = SubDivLine(nGlyphPoints[n], nGlyphPoints[n + 1], Mathf.FloorToInt(pointsInLine));
                 accPoints += cPs.Length;
                 foreach (Vector2 cP in cPs) {
                     bool hasPoint = false;
                     foreach (Vector2 p in nPoints) {
                         if (!hasPoint) {
-                            if (pointInCircle(p, cP, 0.02f)) {
+                            if (PointInCircle(p, cP, 0.02f)) {
                                 hasPoint = true;
                                 pointsFound++;
                             }
@@ -47,9 +47,9 @@ namespace ZeppelinGames {
             return glyphReturnData;
         }
 
-        public static bool isGlyph(Vector2[] points, GlyphSO glyph) {
-            Vector2[] nPoints = normalisePoints(points);
-            Vector2[] nGlyphPoints = normalisePoints(glyph.points);
+        public static bool IsGlyph(Vector2[] points, GlyphSO glyph) {
+            Vector2[] nPoints = NormalisePoints(points);
+            Vector2[] nGlyphPoints = NormalisePoints(glyph.points);
 
             if (nPoints.Length >= nGlyphPoints.Length) {
                 int pointsInside = 0;
@@ -57,7 +57,7 @@ namespace ZeppelinGames {
                     bool pointIn = false;
                     for (int n = 0; n < nGlyphPoints.Length - 1; n++) {
                         if (!pointIn) {
-                            if (pointNearLine(nP, nGlyphPoints[n], nGlyphPoints[n + 1], 0.1f)) {
+                            if (PointNearLine(nP, nGlyphPoints[n], nGlyphPoints[n + 1], 0.1f)) {
                                 pointIn = true;
                                 pointsInside++;
                             }
@@ -69,13 +69,13 @@ namespace ZeppelinGames {
                 int pointsFound = 0;
                 int accPoints = 0;
                 for (int n = 0; n < nGlyphPoints.Length - 1; n++) {
-                    Vector2[] cPs = subDivLine(nGlyphPoints[n], nGlyphPoints[n + 1], Mathf.FloorToInt(pointsInLine));
+                    Vector2[] cPs = SubDivLine(nGlyphPoints[n], nGlyphPoints[n + 1], Mathf.FloorToInt(pointsInLine));
                     accPoints += cPs.Length;
                     foreach (Vector2 cP in cPs) {
                         bool hasPoint = false;
                         foreach (Vector2 p in nPoints) {
                             if (!hasPoint) {
-                                if (pointInCircle(p, cP, 0.02f)) {
+                                if (PointInCircle(p, cP, 0.02f)) {
                                     hasPoint = true;
                                     pointsFound++;
                                 }
@@ -96,17 +96,17 @@ namespace ZeppelinGames {
             return false;
         }
 
-        public static bool pointInRect(Vector2 point, Rectangle rect) {
-            float pointArea = triangleArea(rect.pos + rect.p1, point, rect.pos + rect.p4) +
-                triangleArea(rect.pos + rect.p4, point, rect.pos + rect.p3) +
-                triangleArea(rect.pos + rect.p3, point, rect.pos + rect.p2) +
-                triangleArea(point, rect.pos + rect.p2, rect.pos + rect.p1);
-            float rectArea = triangleArea(rect.pos + rect.p1, rect.pos + rect.p2, rect.pos + rect.p3) + triangleArea(rect.pos + rect.p1, rect.pos + rect.p3, rect.pos + rect.p4);
+        public static bool PointInRect(Vector2 point, Rectangle rect) {
+            float pointArea = TriangleArea(rect.pos + rect.p1, point, rect.pos + rect.p4) +
+                TriangleArea(rect.pos + rect.p4, point, rect.pos + rect.p3) +
+                TriangleArea(rect.pos + rect.p3, point, rect.pos + rect.p2) +
+                TriangleArea(point, rect.pos + rect.p2, rect.pos + rect.p1);
+            float rectArea = TriangleArea(rect.pos + rect.p1, rect.pos + rect.p2, rect.pos + rect.p3) + TriangleArea(rect.pos + rect.p1, rect.pos + rect.p3, rect.pos + rect.p4);
 
             return pointArea > rectArea ? false : true;
         }
 
-        public static bool pointNearLine(Vector2 point, Vector2 lp1, Vector2 lp2, float lineDist) {
+        public static bool PointNearLine(Vector2 point, Vector2 lp1, Vector2 lp2, float lineDist) {
             float d = Mathf.Abs(((lp2.x - lp1.x) * (lp1.y - point.y)) - ((lp1.x - point.x) * (lp2.y - lp1.y))) / Mathf.Sqrt(Mathf.Pow(lp2.x - lp1.x, 2) + Mathf.Pow(lp2.y - lp1.y, 2));
             if (d < lineDist) {
                 return true;
@@ -115,7 +115,7 @@ namespace ZeppelinGames {
             return false;
         }
 
-        public static Vector2[] subDivLine(Vector2 lp1, Vector2 lp2, int subDivs) {
+        public static Vector2[] SubDivLine(Vector2 lp1, Vector2 lp2, int subDivs) {
             List<Vector2> subDivPoints = new List<Vector2>();
             float k = Vector2.Distance(lp2, lp1) / subDivs;
             for (int n = 0; n < subDivs; n++) {
@@ -125,15 +125,15 @@ namespace ZeppelinGames {
             return subDivPoints.ToArray();
         }
 
-        public static bool pointInCircle(Vector2 point, Vector2 circlePos, float circleRadius) {
+        public static bool PointInCircle(Vector2 point, Vector2 circlePos, float circleRadius) {
             return Vector2.Distance(point, circlePos) < circleRadius ? true : false;
         }
 
-        public static float triangleArea(Vector2 a, Vector2 b, Vector2 c) {
+        public static float TriangleArea(Vector2 a, Vector2 b, Vector2 c) {
             return Mathf.Abs((b.x * a.y - a.x * b.y) + (c.x * b.y - b.x * c.y) + (a.x * c.y - c.x * a.y)) / 2;
         }
 
-        public static Vector2[] normalisePoints(Vector2[] points) {
+        public static Vector2[] NormalisePoints(Vector2[] points) {
             Vector2[] normalPoints = new Vector2[points.Length];
 
             Vector2 minPoint = points[0];

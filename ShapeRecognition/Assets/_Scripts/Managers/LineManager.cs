@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static ZeppelinGames.GlyphRecogniser;
 
 public class LineManager : Singleton<LineManager> {
 
@@ -28,13 +29,21 @@ public class LineManager : Singleton<LineManager> {
 
     private Camera mainCamera;
 
-    public bool IsLeapOfFaith { get; private set; }
+    public float maxPointDist = 0.1f;
+    public bool debugMode = false;
+
+    //private List<Vector2> glyphPoints = new List<Vector2>();
+    private List<GlyphSO> glyphs = new List<GlyphSO>();
     #endregion
 
     protected override void Awake() {
         base.Awake();
         lineColorDraw.a = 0.5f;
         mainCamera = Camera.main;
+
+        GlyphSO[] loadedGlyphs = Resources.LoadAll<GlyphSO>("Glyphs/");
+        Debug.Log("Loaded " + loadedGlyphs.Length + " glyphs");
+        glyphs.AddRange(loadedGlyphs);
     }
 
     private void Update() {
@@ -46,7 +55,6 @@ public class LineManager : Singleton<LineManager> {
     }
 
     private IEnumerator Drawing() {
-        IsLeapOfFaith = false;
         isDrawing = true;
         LineCount++;
         StartLine();
@@ -60,7 +68,7 @@ public class LineManager : Singleton<LineManager> {
     private void StartLine() {
         //Init line
         currentLine = new List<Vector2>();
-        GameObject goLine = new GameObject { name = "Line" , tag = "Obstacle"};
+        GameObject goLine = new GameObject { name = "Line", tag = "Obstacle" };
         goLine.transform.parent = linesContainer;
         currentLinerRenderer = goLine.AddComponent<LineRenderer>();
 
@@ -95,16 +103,57 @@ public class LineManager : Singleton<LineManager> {
     }
 
     private void EndLine() {
-        if(currentLine.Count > 1) {
+        if (currentLine.Count > 1) {
             currentLinerRenderer.startColor = lineColor;
             currentLinerRenderer.endColor = lineColor;
             EdgeCollider2D lineEdgeTrigger = currentLinerRenderer.gameObject.AddComponent<EdgeCollider2D>();
-            lineEdgeTrigger.edgeRadius = lineWidth / 2 ;
+            lineEdgeTrigger.edgeRadius = lineWidth / 2;
             lineEdgeTrigger.isTrigger = true;
             lineEdgeTrigger.SetPoints(currentLine);
             EdgeCollider2D lineEdgeCollider = currentLinerRenderer.gameObject.AddComponent<EdgeCollider2D>();
             lineEdgeCollider.edgeRadius = lineWidth / 2;
             lineEdgeCollider.SetPoints(currentLine);
+
+            Reconize();
         }
     }
+
+    private void Reconize() {
+        List<GlyphReturnData> allMatchData = new List<GlyphReturnData>();
+        foreach (GlyphSO matchGlyph in glyphs) {
+            GlyphReturnData glyphData = MatchGlyph(currentLine.ToArray(), matchGlyph);
+            Debug.Log(glyphData.glyphName + " : " +
+                "\n     " + glyphData.matchPercent +
+                " + " + glyphData.keyPointsPercent +
+                " > " + matchGlyph.minMatchPercent +
+                " = " + (glyphData.keyPointsPercent + glyphData.matchPercent > matchGlyph.minMatchPercent));
+            /*   if(glyphData.keyPointsPercent >= matchGlyph.minKeyPointMatchPercentage && glyphData.matchPercent >= matchGlyph.minMatchPercentage)
+               {
+                   allMatchData.Add(glyphData);
+               }*/
+            if (glyphData.keyPointsPercent + glyphData.matchPercent > matchGlyph.minMatchPercent) {
+                allMatchData.Add(glyphData);
+            }
+        }
+
+        GlyphReturnData bestMatch = null;
+        if (allMatchData.Count > 0) {
+            float highestPercent = 0;
+            foreach (GlyphReturnData data in allMatchData) {
+                float avgPer = (data.keyPointsPercent + data.matchPercent) / 2;
+                if (avgPer > highestPercent) {
+                    highestPercent = avgPer;
+                    bestMatch = data;
+                }
+            }
+        }
+
+        if (bestMatch != null) {
+            //Run commmands
+            Debug.Log("Best match : " + bestMatch.glyphName);
+        }
+
+        currentLine.Clear();
+    }
+
 }
