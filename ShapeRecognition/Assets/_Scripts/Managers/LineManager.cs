@@ -30,19 +30,12 @@ public class LineManager : Singleton<LineManager> {
 
     public float maxPointDist = 0.1f;
     public bool debugMode = false;
-
-    //private List<Vector2> glyphPoints = new List<Vector2>();
-    //private List<GlyphSO> glyphs = new List<GlyphSO>();
     #endregion
 
     protected override void Awake() {
         base.Awake();
         lineColorDraw.a = 0.5f;
         mainCamera = Camera.main;
-
-        //GlyphSO[] loadedGlyphs = Resources.LoadAll<GlyphSO>("Glyphs/");
-        //Debug.Log("Loaded " + loadedGlyphs.Length + " glyphs");
-        //glyphs.AddRange(loadedGlyphs);
     }
 
     private void Update() {
@@ -112,49 +105,6 @@ public class LineManager : Singleton<LineManager> {
             EdgeCollider2D lineEdgeCollider = currentLinerRenderer.gameObject.AddComponent<EdgeCollider2D>();
             lineEdgeCollider.edgeRadius = lineWidth / 2;
             lineEdgeCollider.SetPoints(currentLine);
-
-            //Reconize();
         }
     }
-
-    /*
-    private void Reconize() {
-        List<GlyphReturnData> allMatchData = new List<GlyphReturnData>();
-        foreach (GlyphSO matchGlyph in glyphs) {
-            GlyphReturnData glyphData = MatchGlyph(currentLine.ToArray(), matchGlyph);
-            Debug.Log(glyphData.glyphName + " : " +
-                "\n     " + glyphData.matchPercent +
-                " + " + glyphData.keyPointsPercent +
-                " > " + matchGlyph.minMatchPercent +
-                " = " + (glyphData.keyPointsPercent + glyphData.matchPercent > matchGlyph.minMatchPercent));
-               //if(glyphData.keyPointsPercent >= matchGlyph.minKeyPointMatchPercentage && glyphData.matchPercent >= matchGlyph.minMatchPercentage)
-               //{
-               //    allMatchData.Add(glyphData);
-               //}
-            if (glyphData.keyPointsPercent + glyphData.matchPercent > matchGlyph.minMatchPercent) {
-                allMatchData.Add(glyphData);
-            }
-        }
-
-        GlyphReturnData bestMatch = null;
-        if (allMatchData.Count > 0) {
-            float highestPercent = 0;
-            foreach (GlyphReturnData data in allMatchData) {
-                float avgPer = (data.keyPointsPercent + data.matchPercent) / 2;
-                if (avgPer > highestPercent) {
-                    highestPercent = avgPer;
-                    bestMatch = data;
-                }
-            }
-        }
-
-        if (bestMatch != null) {
-            //Run commmands
-            Debug.Log("Best match : " + bestMatch.glyphName);
-        }
-
-        currentLine.Clear();
-    }
-*/
-
 }
