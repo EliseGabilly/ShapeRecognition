@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static ZeppelinGames.GlyphRecogniser;
 
 public class LineManager : Singleton<LineManager> {
 
@@ -33,7 +32,7 @@ public class LineManager : Singleton<LineManager> {
     public bool debugMode = false;
 
     //private List<Vector2> glyphPoints = new List<Vector2>();
-    private List<GlyphSO> glyphs = new List<GlyphSO>();
+    //private List<GlyphSO> glyphs = new List<GlyphSO>();
     #endregion
 
     protected override void Awake() {
@@ -41,9 +40,9 @@ public class LineManager : Singleton<LineManager> {
         lineColorDraw.a = 0.5f;
         mainCamera = Camera.main;
 
-        GlyphSO[] loadedGlyphs = Resources.LoadAll<GlyphSO>("Glyphs/");
-        Debug.Log("Loaded " + loadedGlyphs.Length + " glyphs");
-        glyphs.AddRange(loadedGlyphs);
+        //GlyphSO[] loadedGlyphs = Resources.LoadAll<GlyphSO>("Glyphs/");
+        //Debug.Log("Loaded " + loadedGlyphs.Length + " glyphs");
+        //glyphs.AddRange(loadedGlyphs);
     }
 
     private void Update() {
@@ -114,10 +113,11 @@ public class LineManager : Singleton<LineManager> {
             lineEdgeCollider.edgeRadius = lineWidth / 2;
             lineEdgeCollider.SetPoints(currentLine);
 
-            Reconize();
+            //Reconize();
         }
     }
 
+    /*
     private void Reconize() {
         List<GlyphReturnData> allMatchData = new List<GlyphReturnData>();
         foreach (GlyphSO matchGlyph in glyphs) {
@@ -127,10 +127,10 @@ public class LineManager : Singleton<LineManager> {
                 " + " + glyphData.keyPointsPercent +
                 " > " + matchGlyph.minMatchPercent +
                 " = " + (glyphData.keyPointsPercent + glyphData.matchPercent > matchGlyph.minMatchPercent));
-            /*   if(glyphData.keyPointsPercent >= matchGlyph.minKeyPointMatchPercentage && glyphData.matchPercent >= matchGlyph.minMatchPercentage)
-               {
-                   allMatchData.Add(glyphData);
-               }*/
+               //if(glyphData.keyPointsPercent >= matchGlyph.minKeyPointMatchPercentage && glyphData.matchPercent >= matchGlyph.minMatchPercentage)
+               //{
+               //    allMatchData.Add(glyphData);
+               //}
             if (glyphData.keyPointsPercent + glyphData.matchPercent > matchGlyph.minMatchPercent) {
                 allMatchData.Add(glyphData);
             }
@@ -155,5 +155,6 @@ public class LineManager : Singleton<LineManager> {
 
         currentLine.Clear();
     }
+*/
 
 }
